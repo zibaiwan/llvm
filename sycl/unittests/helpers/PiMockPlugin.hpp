@@ -1149,5 +1149,3 @@ inline pi_result mock_piextEnqueueWriteHostPipe(
   *event = createDummyHandle<pi_event>();
   return PI_SUCCESS;
 }
-
-
