@@ -1661,6 +1661,8 @@ std::vector<DeviceGlobalMapEntry *> ProgramManager::getDeviceGlobalEntries(
   }
   return FoundEntries;
   
+}
+
 void ProgramManager::addOrInitHostPipeEntry(const void *HostPipePtr,
                                             const char *UniqueId) {
   std::lock_guard<std::mutex> HostPipesGuard(m_HostPipesMutex);
