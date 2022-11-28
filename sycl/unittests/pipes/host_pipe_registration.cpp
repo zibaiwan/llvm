@@ -10,7 +10,6 @@
 #include <cstring>
 
 #include <gtest/gtest.h>
-#include <helpers/CommonRedefinitions.hpp>
 #include <helpers/PiImage.hpp>
 #include <helpers/PiMock.hpp>
 
@@ -74,27 +73,20 @@ pi_result redefinedEnqueueWriteHostPipe(pi_queue, pi_program, const char *,
   return PI_SUCCESS;
 }
 
-bool preparePiMock(platform &Plt) {
-  if (Plt.is_host()) {
-    std::cout << "Not run on host - no PI events created in that case"
-              << std::endl;
-    return false;
-  }
-
-  unittest::PiMock Mock{Plt};
+void preparePiMock(unittest::PiMock &Mock) {
   Mock.redefine<detail::PiApiKind::piextEnqueueReadHostPipe>(
       redefinedEnqueueReadHostPipe);
   Mock.redefine<detail::PiApiKind::piextEnqueueWriteHostPipe>(
       redefinedEnqueueWriteHostPipe);
-  return true;
 }
 
 class PipeTest : public ::testing::Test {
 protected:
   void SetUp() override {
-    platform Plt{default_selector()};
-    if (!preparePiMock(Plt))
-      return;
+    sycl::unittest::PiMock Mock;
+    sycl::platform Plt = Mock.getPlatform();
+    preparePiMock(Mock);
+
     context Ctx{Plt.get_devices()[0]};
     queue Q{Ctx, default_selector()};
     plat = Plt;

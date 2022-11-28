@@ -52,7 +52,7 @@ class
 
   struct
 #ifdef __SYCL_DEVICE_ONLY__
-      [[__sycl_detail__::add_ir_global_variable_attributes(
+      [[__sycl_detail__::add_ir_attributes_global_variable(
           "sycl-host-pipe",
           nullptr)]] [[__sycl_detail__::
                            host_pipe]] [[__sycl_detail__::
