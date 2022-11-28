@@ -1,4 +1,5 @@
-// RUN: %clangxx -fsycl -c -fno-color-diagnostics -Xclang -fdump-record-layouts %s -o %t.out | FileCheck %s
+// RUN: %clangxx -fsycl -c -fno-color-diagnostics -Xclang -fdump-record-layouts %s
+// RUN: %clangxx -fsycl -c -fno-color-diagnostics -Xclang -fdump-record-layouts %s | FileCheck %s
 // REQUIRES: linux
 // UNSUPPORTED: libcxx
 
@@ -177,20 +178,32 @@ void foo() {
 // CHECK: 488 |         pointer _M_start
 // CHECK-NEXT: 496 |         pointer _M_finish
 // CHECK-NEXT: 504 |         pointer _M_end_of_storage
-// CHECK-NEXT: 512 |   _Bool MIsHost
-// CHECK-NEXT: 520 |   struct sycl::detail::code_location MCodeLoc
-// CHECK-NEXT: 520 |     const char * MFileName
-// CHECK-NEXT: 528 |     const char * MFunctionName
-// CHECK-NEXT: 536 |     unsigned long MLineNo
-// CHECK-NEXT: 544 |     unsigned long MColumnNo
-// CHECK-NEXT: 552 |   _Bool MIsFinalized
-// CHECK-NEXT: 560 |   class sycl::event MLastEvent
-// CHECK-NEXT: 560 | class sycl::detail::OwnerLessBase<class sycl::event> (base) (empty)
-// CHECK-NEXT: 560 |     class std::shared_ptr<class sycl::detail::event_impl> impl
-// CHECK-NEXT: 560 |       class std::__shared_ptr<class sycl::detail::event_impl> (base)
-// CHECK-NEXT: 560 |         class std::__shared_ptr_access<class sycl::detail::event_impl, __gnu_cxx::_S_atomic, false, false> (base) (empty)
-// CHECK-NEXT: 560 |         element_type * _M_ptr
-// CHECK-NEXT: 568 |         class std::__shared_count<> _M_refcount
-// CHECK-NEXT: 568 |           _Sp_counted_base<(_Lock_policy)2U> * _M_pi
-// CHECK-NEXT:     | [sizeof=576, dsize=576, align=8,
-// CHECK-NEXT:     |  nvsize=576, nvalign=8]
+// CHECK-NEXT: 512 |   class std::basic_string<char> HostPipeName
+// CHECK-NEXT: 512 |     struct std::basic_string<char>::_Alloc_hider _M_dataplus
+// CHECK-NEXT: 512 |       class std::allocator<char> (base) (empty)
+// CHECK-NEXT: 512 |         class __gnu_cxx::new_allocator<char> (base) (empty)
+// CHECK-NEXT: 512 |       pointer _M_p
+// CHECK-NEXT: 520 |     size_type _M_string_length
+// CHECK-NEXT: 528 |     union std::basic_string<char>::(anonymous at /usr/lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/basic_string.h:175:7) 
+// CHECK-NEXT: 528 |       char[16] _M_local_buf
+// CHECK-NEXT: 528 |       size_type _M_allocated_capacity
+// CHECK-NEXT: 544 |   void * HostPipePtr
+// CHECK-NEXT: 552 |   _Bool HostPipeBlocking
+// CHECK-NEXT: 560 |   size_t HostPipeTypeSize
+// CHECK-NEXT: 568 |   _Bool HostPipeRead
+// CHECK-NEXT: 569 |   _Bool MIsHost
+// CHECK-NEXT: 576 |   struct sycl::detail::code_location MCodeLoc
+// CHECK-NEXT: 576 |     const char * MFileName
+// CHECK-NEXT: 584 |     const char * MFunctionName
+// CHECK-NEXT: 592 |     unsigned long MLineNo
+// CHECK-NEXT: 600 |     unsigned long MColumnNo
+// CHECK-NEXT: 608 |   _Bool MIsFinalized
+// CHECK-NEXT: 616 |   class sycl::event MLastEvent
+// CHECK-NEXT: 616 |     class std::shared_ptr<class sycl::detail::event_impl> impl
+// CHECK-NEXT: 616 |       class std::__shared_ptr<class sycl::detail::event_impl, __gnu_cxx::_S_atomic> (base)
+// CHECK-NEXT: 616 |         class std::__shared_ptr_access<class sycl::detail::event_impl, __gnu_cxx::_S_atomic, false, false> (base) (empty)
+// CHECK-NEXT: 616 |         element_type * _M_ptr
+// CHECK-NEXT: 624 |         class std::__shared_count<__gnu_cxx::_S_atomic> _M_refcount
+// CHECK-NEXT: 624 |           _Sp_counted_base<(_Lock_policy)2U> * _M_pi
+// CHECK-NEXT:     | [sizeof=632, dsize=632, align=8,
+// CHECK-NEXT:     |  nvsize=632, nvalign=8]
