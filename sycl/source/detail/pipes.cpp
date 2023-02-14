@@ -16,7 +16,7 @@ namespace ext {
 namespace intel {
 namespace experimental {
 
-std::string pipe_base::get_pipe_name(const void *HostPipePtr){
+__SYCL_EXPORT std::string pipe_base::get_pipe_name(const void *HostPipePtr){
      return sycl::_V1::detail::ProgramManager::getInstance().getHostPipeEntry(HostPipePtr)->MUniqueId;
     }
 
