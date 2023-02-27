@@ -195,40 +195,51 @@ public:
   // Host API
   static _dataT read(queue & q, memory_order order = memory_order::seq_cst)
   {
+     std::cout << "Zibai pipes.hpp read is being called \n";
      const device Dev = q.get_device();
-      bool IsReadPipeSupported =
-          Dev.has_extension("cl_intel_program_scope_host_pipe");
-      if (!IsReadPipeSupported) {
-        return &_dataT();
-      }
+      // bool IsReadPipeSupported =
+      //     Dev.has_extension("cl_intel_program_scope_host_pipe");
+      // if (!IsReadPipeSupported) {
+      //   std::cout << "Zibai pipes.hpp read is being called not supported 2\n";
+      //   return &_dataT();
+      // }
       _dataT data;
       const void *HostPipePtr = &m_Storage;
       const std::string pipe_name = pipe_base::get_pipe_name(HostPipePtr);
+       std::cout << "Zibai pipes.hpp read is being called 2\n";
       event e = q.submit([=](handler &CGH) {
         CGH.read_write_host_pipe(pipe_name, (void *)(&data), sizeof(_dataT), false,
                                 true /* read */);
       });
+       std::cout << "Zibai pipes.hpp read is being called 3\n";
       e.wait();
+       std::cout << "Zibai pipes.hpp read is being called 4\n";
       return data;
   }
 
   static void write(queue & q, const _dataT &data,
                     memory_order order = memory_order::seq_cst)
   {
+  std::cout << "Zibai pipes.hpp write is being called \n";
   const device Dev = q.get_device();
-  bool IsReadPipeSupported =
-      Dev.has_extension("cl_intel_program_scope_host_pipe");
-  if (!IsReadPipeSupported) {
-    return;
-  }
+  // bool IsReadPipeSupported =
+  //     Dev.has_extension("cl_intel_program_scope_host_pipe");
+  // if (!IsReadPipeSupported) {
+  //   std::cout << "Zibai pipes.hpp write is being called not supported\n";
+  //   return;
+  // }
+  std::cout << "Zibai pipes.hpp write is being called 2\n";
   const void *HostPipePtr = &m_Storage;
   const std::string pipe_name = pipe_base::get_pipe_name(HostPipePtr);
   const void *data_ptr = &data;
+  std::cout << "Zibai pipes.hpp write is being called 3\n";
   event e = q.submit([=](handler &CGH) {
     CGH.read_write_host_pipe(pipe_name, (void *)data_ptr, sizeof(_dataT), false,
                              false /* write */);
   });
+  std::cout << "Zibai pipes.hpp write is being called 4\n";
   e.wait();
+  std::cout << "Zibai pipes.hpp write is being called 5\n";
 }
   
   // Reading from pipe is lowered to SPIR-V instruction OpReadPipe via SPIR-V

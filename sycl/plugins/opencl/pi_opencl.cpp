@@ -72,8 +72,8 @@ CONSTFIX char clEnqueueWriteGlobalVariableName[] =
 CONSTFIX char clEnqueueReadGlobalVariableName[] =
     "clEnqueueReadGlobalVariableINTEL";
 // Names of host pipe functions queried from OpenCL
-CONSTFIX char clEnqueueReadHostPipeName[] = "clEnqueueReadHostPipeIntelFPGA";
-CONSTFIX char clEnqueueWriteHostPipeName[] = "clEnqueueWriteHostPipeIntelFPGA";
+CONSTFIX char clEnqueueReadHostPipeName[] = "clEnqueueReadHostPipeINTEL";
+CONSTFIX char clEnqueueWriteHostPipeName[] = "clEnqueueWriteHostPipeINTEL";
 
 #undef CONSTFIX
 
@@ -943,10 +943,12 @@ pi_result piProgramCreateWithBinary(
   (void)num_metadata_entries;
 
   pi_result ret_err = PI_ERROR_INVALID_OPERATION;
+  std::clog << ret_err << " Zibai debug ret_err before clCreateProgramWithBinary\n";
   *ret_program = cast<pi_program>(clCreateProgramWithBinary(
       cast<cl_context>(context), cast<cl_uint>(num_devices),
       cast<const cl_device_id *>(device_list), lengths, binaries,
       cast<cl_int *>(binary_status), cast<cl_int *>(&ret_err)));
+  std::clog << ret_err << " Zibai debug ret_err after clCreateProgramWithBinary\n";
   return ret_err;
 }
 
@@ -1656,6 +1658,7 @@ pi_result piextEnqueueReadHostPipe(pi_queue queue, pi_program program,
                                    pi_uint32 num_events_in_waitlist,
                                    const pi_event *events_waitlist,
                                    pi_event *event) {
+  std::cout << "Zibai debug piextEnqueueReadHostPipe 1\n";
   cl_context CLContext;
   cl_int CLErr =
       clGetCommandQueueInfo(cast<cl_command_queue>(queue), CL_QUEUE_CONTEXT,
@@ -1663,19 +1666,19 @@ pi_result piextEnqueueReadHostPipe(pi_queue queue, pi_program program,
   if (CLErr != CL_SUCCESS) {
     return cast<pi_result>(CLErr);
   }
-
-  clEnqueueReadHostPipeIntelFPGA_fn FuncPtr = nullptr;
+  std::cout << "Zibai debug piextEnqueueReadHostPipe 2\n";
+  clEnqueueReadHostPipeIntelFPGA_fn  FuncPtr = nullptr;
   pi_result RetVal = getExtFuncFromContext<clEnqueueReadHostPipeName,
                                            clEnqueueReadHostPipeIntelFPGA_fn>(
       cast<pi_context>(CLContext), &FuncPtr);
-
+  std::cout << "Zibai debug piextEnqueueReadHostPipe 3\n";
   if (FuncPtr) {
     RetVal = cast<pi_result>(FuncPtr(
         cast<cl_command_queue>(queue), cast<cl_program>(program), pipe_symbol,
         blocking, ptr, size, num_events_in_waitlist,
         cast<const cl_event *>(events_waitlist), cast<cl_event *>(event)));
   }
-
+  std::cout << "Zibai debug piextEnqueueReadHostPipe 4\n";
   return RetVal;
 }
 
@@ -1685,6 +1688,7 @@ pi_result piextEnqueueWriteHostPipe(pi_queue queue, pi_program program,
                                     pi_uint32 num_events_in_waitlist,
                                     const pi_event *events_waitlist,
                                     pi_event *event) {
+  std::cout << "Zibai debug piextEnqueueWriteHostPipe 1\n";
   cl_context CLContext;
   cl_int CLErr =
       clGetCommandQueueInfo(cast<cl_command_queue>(queue), CL_QUEUE_CONTEXT,
@@ -1692,19 +1696,19 @@ pi_result piextEnqueueWriteHostPipe(pi_queue queue, pi_program program,
   if (CLErr != CL_SUCCESS) {
     return cast<pi_result>(CLErr);
   }
-
-  clEnqueueWriteHostPipeIntelFPGA_fn FuncPtr = nullptr;
+  std::cout << "Zibai debug piextEnqueueWriteHostPipe 2\n";
+  clEnqueueWriteHostPipeIntelFPGA_fn  FuncPtr = nullptr;
   pi_result RetVal = getExtFuncFromContext<clEnqueueWriteHostPipeName,
                                            clEnqueueWriteHostPipeIntelFPGA_fn>(
       cast<pi_context>(CLContext), &FuncPtr);
-
+  std::cout << "Zibai debug piextEnqueueWriteHostPipe 3\n";
   if (FuncPtr) {
     RetVal = cast<pi_result>(FuncPtr(
         cast<cl_command_queue>(queue), cast<cl_program>(program), pipe_symbol,
         blocking, ptr, size, num_events_in_waitlist,
         cast<const cl_event *>(events_waitlist), cast<cl_event *>(event)));
   }
-
+  std::cout << "Zibai debug piextEnqueueWriteHostPipe 4\n";
   return RetVal;
 }
 

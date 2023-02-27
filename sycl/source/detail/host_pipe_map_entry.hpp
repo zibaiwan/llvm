@@ -48,6 +48,7 @@ struct HostPipeMapEntry {
   }
 
   void initialize(const RTDeviceBinaryImage *DeviceImage) {
+    std::cout << "Zibai debug initializing HostPipeMapEntry DeviceImage \n";
     mDeviceImage = DeviceImage;
   }
 };

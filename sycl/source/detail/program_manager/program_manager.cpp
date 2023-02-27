@@ -276,13 +276,17 @@ static const char *getFormatStr(RT::PiDeviceBinaryType Format) {
 
 RT::PiProgram ProgramManager::createPIProgram(const RTDeviceBinaryImage &Img,
                                               const context &Context,
-                                              const device &Device) {
-  if (DbgProgMgr > 0)
+                                              const device &Device) {                                            
+  // if (DbgProgMgr > 0)
     std::cerr << ">>> ProgramManager::createPIProgram(" << &Img << ", "
               << getRawSyclObjImpl(Context) << ", " << getRawSyclObjImpl(Device)
               << ")\n";
+  std::cout << "Zibai debug createPIProgram is called 1\n";
+  // if (Img == NULL){
+  //   std::cout << "Zibai debug createPIProgram is called, Img is NULL\n";
+  // }
   const pi_device_binary_struct &RawImg = Img.getRawData();
-
+  std::cout << "Zibai debug createPIProgram is called 1.5\n";
   // perform minimal sanity checks on the device image and the descriptor
   if (RawImg.BinaryEnd < RawImg.BinaryStart) {
     throw runtime_error("Malformed device program image descriptor",
@@ -293,7 +297,7 @@ RT::PiProgram ProgramManager::createPIProgram(const RTDeviceBinaryImage &Img,
                         PI_ERROR_INVALID_VALUE);
   }
   size_t ImgSize = Img.getSize();
-
+   std::cout << "Zibai debug createPIProgram is called 2\n";
   // TODO if the binary image is a part of the fat binary, the clang
   //   driver should have set proper format option to the
   //   clang-offload-wrapper. The fix depends on AOT compilation
@@ -301,22 +305,22 @@ RT::PiProgram ProgramManager::createPIProgram(const RTDeviceBinaryImage &Img,
   //   Img->Format can't be updated as it is inside of the in-memory
   //   OS module binary.
   RT::PiDeviceBinaryType Format = Img.getFormat();
-
+  std::cout << "Zibai debug createPIProgram is called 3\n";
   if (Format == PI_DEVICE_BINARY_TYPE_NONE)
     Format = pi::getBinaryImageFormat(RawImg.BinaryStart, ImgSize);
   // RT::PiDeviceBinaryType Format = Img->Format;
   // assert(Format != PI_DEVICE_BINARY_TYPE_NONE && "Image format not set");
-
+   std::cout << "Zibai debug createPIProgram is called 4\n";
   if (!isDeviceBinaryTypeSupported(Context, Format))
     throw feature_not_supported(
         "SPIR-V online compilation is not supported in this context",
         PI_ERROR_INVALID_OPERATION);
-
+   std::cout << "Zibai debug createPIProgram is called 5\n";
   // Get program metadata from properties
   auto ProgMetadata = Img.getProgramMetadata();
   std::vector<pi_device_binary_property> ProgMetadataVector{
       ProgMetadata.begin(), ProgMetadata.end()};
-
+   std::cout << "Zibai debug createPIProgram is called 6\n";
   // Load the image
   const ContextImplPtr Ctx = getSyclObjImpl(Context);
   RT::PiProgram Res = Format == PI_DEVICE_BINARY_TYPE_SPIRV
@@ -329,13 +333,13 @@ RT::PiProgram ProgramManager::createPIProgram(const RTDeviceBinaryImage &Img,
     // associate the PI program with the image it was created for
     NativePrograms[Res] = &Img;
   }
-
+   std::cout << "Zibai debug createPIProgram is called 7\n";
   Ctx->addDeviceGlobalInitializer(Res, {Device}, &Img);
 
   if (DbgProgMgr > 1)
     std::cerr << "created program: " << Res
               << "; image format: " << getFormatStr(Format) << "\n";
-
+   std::cout << "Zibai debug createPIProgram is called 8\n";
   return Res;
 }
 
@@ -1308,10 +1312,13 @@ void ProgramManager::addImages(pi_device_binaries DeviceBinary) {
       }
       // ... and initialize associated host_pipe information
       {
+        std::cout << "Zibai debug program_manager->adding hostpipe info is called 1 \n ";
         std::lock_guard HostPipesGuard(m_HostPipesMutex);
-
+        std::cout << "Zibai debug program_manager->adding hostpipe info is called 2 \n ";
         auto HostPipes = Img->getHostPipes();
+        // Zibai: here is the problem!
         for (const pi_device_binary_property &HostPipe : HostPipes) {
+          std::cout << "Zibai debug program_manager->adding hostpipe info is called, any hostpipe exist? \n ";
           ByteArray HostPipeInfo = DeviceBinaryProperty(HostPipe).asByteArray();
 
           // The supplied host_pipe info property is expected to contain:
@@ -1329,17 +1336,22 @@ void ProgramManager::addImages(pi_device_binaries DeviceBinary) {
           if (ExistingHostPipe != m_HostPipes.end()) {
             // If it has already been registered we update the information.
             ExistingHostPipe->second->initialize(TypeSize);
+            std::cout << "Zibai debug ExistingHostPipe->second->initialize is called 1 \n ";
             ExistingHostPipe->second->initialize(Img.get());
+            std::cout << "Zibai debug ExistingHostPipe->second->initialize is called 1.5 \n ";
           } else {
             // If it has not already been registered we create a new entry.
             // Note: Pointer to the host pipe is not available here, so it
             //       cannot be set until registration happens.
             auto EntryUPtr =
                 std::make_unique<HostPipeMapEntry>(HostPipe->Name, TypeSize);
+            std::cout << "Zibai debug ExistingHostPipe->second->initialize is called 2 \n ";
             EntryUPtr->initialize(Img.get());
+            std::cout << "Zibai debug ExistingHostPipe->second->initialize is called 2.5 \n ";
             m_HostPipes.emplace(HostPipe->Name, std::move(EntryUPtr));
           }
         }
+        std::cout << "Zibai debug program_manager->adding hostpipe info is called 3 \n ";
       }
       m_DeviceImages[KSId].reset(new std::vector<RTDeviceBinaryImageUPtr>());
       cacheKernelUsesAssertInfo(M, *Img);
@@ -1665,6 +1677,7 @@ std::vector<DeviceGlobalMapEntry *> ProgramManager::getDeviceGlobalEntries(
 
 void ProgramManager::addOrInitHostPipeEntry(const void *HostPipePtr,
                                             const char *UniqueId) {
+  std::cout << "Zibai debug addOrInitHostPipeEntry is being called\n";
   std::lock_guard<std::mutex> HostPipesGuard(m_HostPipesMutex);
 
   assert(m_HostPipes.find(UniqueId) == m_HostPipes.end() &&

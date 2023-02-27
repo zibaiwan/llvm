@@ -2217,9 +2217,14 @@ pi_int32 enqueueReadWriteHostPipe(const QueueImplPtr &Queue,
   // will violate the spec
   detail::HostPipeMapEntry *hostPipeEntry =
       ProgramManager::getInstance().getHostPipeEntry(PipeName);
+  std::cout << "Zibai debug enqueueReadWriteHostPipe is called\n";
+  std::cout << "zibai debug printing mDeviceImage " << (hostPipeEntry->mDeviceImage) << "\n"; // This prints 0
+  if (hostPipeEntry->mDeviceImage == NULL){
+    std::cout << "Zibai debug enqueueReadWriteHostPipe is called, warning hostPipeEntry->mDeviceImage is NULL \n";
+  }
   RT::PiProgram Program = ProgramManager::getInstance().createPIProgram(
       *(hostPipeEntry->mDeviceImage), Queue->get_context(),
-      Queue->get_device());
+      Queue->get_device()); // This is creating a segFault Zibai debug
 
   // Get plugin for calling opencl functions
   const detail::plugin &Plugin = Queue->getPlugin();

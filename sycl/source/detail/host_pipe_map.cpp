@@ -14,6 +14,7 @@ namespace detail {
 namespace host_pipe_map {
 
 __SYCL_EXPORT void add(const void *HostPipePtr, const char *UniqueId) {
+  std::cout << "Zibai debug host_pipe_map add is being called \n";
   detail::ProgramManager::getInstance().addOrInitHostPipeEntry(HostPipePtr,
                                                                UniqueId);
 }

@@ -154,7 +154,13 @@ public:
     return getFormat() == PI_DEVICE_BINARY_TYPE_SPIRV;
   }
 
-  const pi_device_binary_struct &getRawData() const { return *get(); }
+  const pi_device_binary_struct &getRawData() const { 
+    std::cout << "Zibai debug RTDeviceBinaryImage->getRawData is called 1\n";
+    auto res = get(); // Zibai debug
+    std::cout << "Zibai debug RTDeviceBinaryImage->getRawData is called 2\n";
+    return *res; // Zibai debug
+    // return *get(); 
+  }
 
   virtual void print() const;
   virtual void dump(std::ostream &Out) const;
@@ -231,7 +237,15 @@ public:
 
 protected:
   void init(pi_device_binary Bin);
-  pi_device_binary get() const { return Bin; }
+  pi_device_binary get() const { 
+    std::cout << "Zibai debug RTDeviceBinaryImage->get(), is called 0 \n";
+    // assert(Bin && "get() is not available without a binary image."); //Zibai debug
+    if (Bin == nullptr){
+      std::cout << "Zibai debug RTDeviceBinaryImage->get() is called 0.5 \n";
+    }
+    std::cout << "Zibai debug RTDeviceBinaryImage->get() is called 1 \n";
+    return Bin; 
+  }
 
   pi_device_binary Bin;
   OSModuleHandle ModuleHandle;
